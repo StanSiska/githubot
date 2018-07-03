@@ -1,0 +1,36 @@
+jobs:
+  build:
+    docker:
+      - image: circleci/node:7.10
+
+    working_directory: ~/hubot
+
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get install python-dev
+            sudo curl -O https://bootstrap.pypa.io/get-pip.py
+            sudo python get-pip.py
+            sudo pip install awscli --upgrade
+
+      - run:
+          name: Download SECRETS file from S3 bucket
+          command: aws s3 cp --region eu-central-1 s3://or562-multipurpose/env.sh .
+
+      - run:
+          name: Build Docker image with Whobot
+          command: docker build -t whobot:v_$CIRCLE_BUILD_NUM .
+
+      - deploy:
+          name: Tag and push image to AWS ECR
+          command: |
+            set -x
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              bash ./deploy.sh
+            else
+              echo "Not master branch so doing nothing!"
+            fi

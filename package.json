@@ -1,0 +1,28 @@
+{
+  "name": "whobot",
+  "version": "1.0.0",
+  "private": true,
+  "author": "nno.lab.prague@gmail.com",
+  "description": "Automated GitHub bot",
+  "dependencies": {
+    "coffeescript": "^1.12.6",
+    "hubot": "^2.19.0",
+    "hubot-diagnostics": "0.0.2",
+    "hubot-github-webhook-listener": "^0.9.1",
+    "hubot-google-images": "^0.2.7",
+    "hubot-google-translate": "^0.2.1",
+    "hubot-help": "^0.2.2",
+    "hubot-heroku-keepalive": "^1.0.3",
+    "hubot-lgtm": "^2.0.1",
+    "hubot-maps": "0.0.3",
+    "hubot-pugme": "^0.1.1",
+    "hubot-redis-brain": "0.0.4",
+    "hubot-response": "^1.2.0",
+    "hubot-rules": "^0.1.2",
+    "hubot-shipit": "^0.2.1",
+    "hubot-slack": "^4.5.1"
+  },
+  "engines": {
+    "node": ">=0.10.3"
+  }
+}
