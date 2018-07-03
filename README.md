@@ -27,8 +27,7 @@ Then you can interact with Githubot by typing `robot help`.
 
     robot> robot help - Displays all of the help commands that robot knows about.
     robot> robot list your pull requests - returns list of pull requests hubot is monitoring
-#   robot> robot check your pull requests - checks pull requests assigned to bot and merges approved ones
-    ...
+    robot> robot check your pull requests - checks pull requests assigned to bot and merges approved ones
 
 ### Configuration
 
