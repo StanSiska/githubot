@@ -45,7 +45,7 @@ listPullRequests = (robot, res) ->
 mergePullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
-    # return notify robot, res, "No pull requests have been assigned to me." if not issues.length
+    return notify robot, res, "I don't see any requests assigned to me." if not issues.length
     issues.forEach (issue) ->
       # Abort if it's closed or not a pull request.
       return if not issue.pull_request or issue.state != "open"
