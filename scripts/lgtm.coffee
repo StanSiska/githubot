@@ -34,6 +34,9 @@ ignoreList = []
 listPullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
+    console.log issues
+
+    return notify robot, res, "No pull requests have been assigned to me." if not issues.length
     pullRequests = issues.map (issue) ->
       if issue.pull_request and issue.state is "open"
         return "https://github.com/#{issue.repository.owner.login}/#{issue.repository.name}/pull/#{issue.number}"
@@ -44,6 +47,9 @@ listPullRequests = (robot, res) ->
 mergePullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
+    console.log issues
+
+    return notify robot, res, "I don't see any requests assigned to me." if not issues.length
     issues.forEach (issue) ->
       # Abort if it's closed or not a pull request.
       return if not issue.pull_request or issue.state != "open"
