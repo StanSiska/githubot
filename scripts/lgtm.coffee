@@ -81,7 +81,7 @@ checkReviews = (robot, issue, res) ->
             notify robot, res, "Merged [#{issue.repo}##{issue.number}](#{url}). Thanks for the review #{Object.keys(approvers).join(' and ')}! ✌︎"
 
 notify = (robot, res, msg) ->
-  if res and /Responses/.test res.constructor.name
+  if res and /Response/.test res.constructor.name
     return res.send msg
   if room
     return robot.messageRoom room, msg
