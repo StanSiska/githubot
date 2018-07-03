@@ -97,7 +97,7 @@ module.exports = (robot) ->
   robot.respond /(show|list|what are) (your )?(pull requests|prs?)/i, (res) ->
     listPullRequests robot, res
 
-  # HUBOT_LGTM_INTERVAL is set to false, don't poll GH.
+  # HUBOT_LGTM_INTERVAL is set to false, don't poll GitHub.
   return if not interval
 
   setInterval(=>
