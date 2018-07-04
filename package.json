@@ -5,6 +5,7 @@
   "author": "inno.lab.prague@gmail.com",
   "description": "Automated GitHub bot",
   "dependencies": {
+    "coffeescript": "^1.12.6",
     "hubot": "^2.0.0",
     "hubot-diagnostics": "0.0.2",
     "hubot-github-webhook-listener": "^0.9.1",
@@ -19,8 +20,7 @@
     "hubot-response": "^1.2.0",
     "hubot-rules": "^0.1.2",
     "hubot-shipit": "^0.2.1",
-    "hubot-slack": "^4.5.1",
-    "coffeescript": "^1.12.6"
+    "hubot-slack": "^4.5.1"
   },
   "engines": {
     "node": ">=0.10.3"

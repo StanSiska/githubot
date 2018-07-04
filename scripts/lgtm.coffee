@@ -9,8 +9,8 @@
 #   HUBOT_LGTM_DISABLE_MD - [optional] Set to `true` to disable the use of markdown in messages.
 #
 # Commands:
-#   hubot list your pull requests - returns list of pull requests hubot is monitoring
-#   hubot check your pull requests - checks pull requests assigned to bot and merges approved ones
+#   robot list your pull requests - returns list of pull requests hubot is monitoring
+#   robot check your pull requests - checks pull requests assigned to bot and merges approved ones
 #
 # Author:
 #   contolini
@@ -34,7 +34,8 @@ ignoreList = []
 listPullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
-    return issues.length
+    # return notify robot, res, "No pull requests have been assigned to me." if not issues.length
+    return notify robot, res, "" if not issues.length
     pullRequests = issues.map (issue) ->
       if issue.pull_request and issue.state is "open"
         return "https://github.com/#{issue.repository.owner.login}/#{issue.repository.name}/pull/#{issue.number}"
@@ -45,7 +46,8 @@ listPullRequests = (robot, res) ->
 mergePullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
-    return issues.length
+    # return notify robot, res, "No pull requests have been assigned to me." if not issues.length
+    return notify robot, res, "" if not issues.length
     issues.forEach (issue) ->
       # Abort if it's closed or not a pull request.
       return if not issue.pull_request or issue.state != "open"
