@@ -48,7 +48,7 @@ mergePullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
     return notify robot, res, "No pull requests have been assigned" if not issues.length
-    
+
     issues.forEach (issue) ->
       # Abort if it's closed or not a pull request.
       return if not issue.pull_request or issue.state != "open"
@@ -96,14 +96,14 @@ module.exports = (robot) ->
   github.authenticate type: "oauth", token: token
 
   robot.respond /check (your )?(pull requests|prs?)/i, (res) ->
-    mergePullRequests robot, res
+  mergePullRequests robot, res
 
   robot.respond /(show|list|what are) (your )?(pull requests|prs?)/i, (res) ->
-    listPullRequests robot, res
+  listPullRequests robot, res
 
   # HUBOT_LGTM_INTERVAL is set to false, don't poll GitHub.
   return if not interval
 
   setInterval(=>
-    mergePullRequests robot
+  mergePullRequests robot
   , interval * 1000)
