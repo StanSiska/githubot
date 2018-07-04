@@ -6,6 +6,7 @@
   "description": "Automated GitHub bot",
   "dependencies": {
     "coffeescript": "^1.12.6",
+    "grunt-cli": "^1.2.0",
     "hubot": "^2.0.0",
     "hubot-diagnostics": "0.0.2",
     "hubot-github-webhook-listener": "^0.9.1",

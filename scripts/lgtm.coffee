@@ -21,8 +21,9 @@ regexEscape = require 'regex-escape'
 token = process.env.HUBOT_LGTM_GITHUB_TOKEN
 room = process.env.HUBOT_LGTM_NOTIFICATION_ROOM
 ignoreFailures = process.env.HUBOT_LGTM_IGNORE_FAILURES
-interval = process.env.HUBOT_LGTM_INTERVAL || 60
+interval = process.env.HUBOT_LGTM_INTERVAL || 3600
 threshold = process.env.HUBOT_LGTM_THRESHOLD || 1
+verbose = process.env.HUBOT_LGTM_VERBOSE || true
 
 # Initialize GH API.
 github = new github version: "3.0.0", debug: false, headers: Accept: "application/vnd.github.moondragon+json"
@@ -34,8 +35,8 @@ ignoreList = []
 listPullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
-    # return notify robot, res, "No pull requests have been assigned to me." if not issues.length
-    return notify robot, res, "" if not issues.length
+    return notify robot, res, "No pull requests have been assigned" if not issues.length
+
     pullRequests = issues.map (issue) ->
       if issue.pull_request and issue.state is "open"
         return "https://github.com/#{issue.repository.owner.login}/#{issue.repository.name}/pull/#{issue.number}"
@@ -46,8 +47,8 @@ listPullRequests = (robot, res) ->
 mergePullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
-    # return notify robot, res, "No pull requests have been assigned to me." if not issues.length
-    return notify robot, res, "" if not issues.length
+    return notify robot, res, "No pull requests have been assigned" if not issues.length
+    
     issues.forEach (issue) ->
       # Abort if it's closed or not a pull request.
       return if not issue.pull_request or issue.state != "open"
@@ -83,10 +84,11 @@ checkReviews = (robot, issue, res) ->
             notify robot, res, "Merged [#{issue.repo}##{issue.number}](#{url}). Thanks for the review #{Object.keys(approvers).join(' and ')}! ✌︎"
 
 notify = (robot, res, msg) ->
-  if res and /Response/.test res.constructor.name
-    return res.send msg
-  if room
-    return robot.messageRoom room, msg
+  if msg is not /No pull requests have been assigned/           # Filter the dummy message , but keep checking on background.
+    if res and /Response/.test res.constructor.name
+      return res.send msg
+    if room
+      return robot.messageRoom room, msg
 
 module.exports = (robot) ->
 
