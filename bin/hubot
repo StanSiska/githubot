@@ -5,4 +5,6 @@ set -e
 npm install
 export PATH="node_modules/.bin:node_modules/hubot/node_modules/.bin:$PATH"
 
+cp ./scripts/lgtm.coffee ./node_modules/hubot-lgtm/src/lgtm.coffee
+
 exec node_modules/.bin/hubot --name "robot" "$@"
