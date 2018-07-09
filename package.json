@@ -5,7 +5,7 @@
   "author": "inno.lab.prague@gmail.com",
   "description": "Automated GitHub bot",
   "dependencies": {
-    "coffeescript": "~1.12.6",
+    "coffeescript": "^1.12.6",
     "grunt-cli": "^1.2.0",
     "hubot": "^2.0.0",
     "hubot-diagnostics": "0.0.2",

@@ -7,13 +7,12 @@
 #   HUBOT_LGTM_IGNORE_FAILURES - [optional] Set to `true` if you don't want to be notified about failed merge attempts.
 #   HUBOT_LGTM_INTERVAL - [optional] # of seconds to check GitHub for approved PRs. Defaults to 60.
 #   HUBOT_LGTM_DISABLE_MD - [optional] Set to `true` to disable the use of markdown in messages.
+#   HUBOT_LGTM_VERBOSE - [optional] Set to `true` to disable verbose mode
 #
 # Commands:
-#   robot list your pull requests - returns list of pull requests hubot is monitoring
-#   robot check your pull requests - checks pull requests assigned to bot and merges approved ones
+#   hubot list your pull requests - returns list of pull requests hubot is monitoring
+#   hubot check your pull requests - checks pull requests assigned to bot and merges approved ones
 #
-# Author:
-#   contolini
 
 github = require 'github'
 regexEscape = require 'regex-escape'
@@ -21,9 +20,9 @@ regexEscape = require 'regex-escape'
 token = process.env.HUBOT_LGTM_GITHUB_TOKEN
 room = process.env.HUBOT_LGTM_NOTIFICATION_ROOM
 ignoreFailures = process.env.HUBOT_LGTM_IGNORE_FAILURES
-interval = process.env.HUBOT_LGTM_INTERVAL || 3600
+interval = process.env.HUBOT_LGTM_INTERVAL || 300
 threshold = process.env.HUBOT_LGTM_THRESHOLD || 1
-verbose = process.env.HUBOT_LGTM_VERBOSE || true
+verbose_mode = process.env.HUBOT_LGTM_VERBOSE || false
 
 # Initialize GH API.
 github = new github version: "3.0.0", debug: false, headers: Accept: "application/vnd.github.moondragon+json"
@@ -35,7 +34,25 @@ ignoreList = []
 listPullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
-    return notify robot, res, "No pull requests have been assigned" if not issues.length
+
+    console.log('listPullRequests: ' + verbose_mode + ' Issues length: '+ issues.length)
+
+    if not issues.length
+      if verbose_mode == true
+        # console.log('mergePullRequests verbose no issues')
+        return notify robot, res, "listPullRequests: No pull requests have been assigned"
+      else
+        console.log('listPullRequests: Verbose mode off - no issues')
+
+    else
+      if verbose_mode == true
+        console.log('listPullRequests Issues > 0 ')
+        return notify robot, res, "listPullRequests: There is " + issues.length + " requests assigned"
+        # return notify robot, res, "listPullRequests: There is " + issues.length + " requests assigned" if verbose_mode == true
+
+      else
+        console.log('mergePullRequests: Verbose mode off - ' + issues.length + ' requests assigned')
+
 
     pullRequests = issues.map (issue) ->
       if issue.pull_request and issue.state is "open"
@@ -47,7 +64,15 @@ listPullRequests = (robot, res) ->
 mergePullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
-    return notify robot, res, "No pull requests have been assigned" if not issues.length
+
+    console.log('mergePullRequests: ' + verbose_mode + ' Issues length: '+ issues.length + ' Issues content: ' + issues)
+
+    if not issues.length
+        console.log('mergePullRequests: Verbose mode is: ' + verbose_mode + ' > No pull requests have been assigned')
+        return notify robot, res, "mergePullRequests: No pull requests have been assigned" if verbose_mode == 'true'
+    else
+        console.log('mergePullRequests Issues > 0 ')
+        return notify robot, res, "mergePullRequests: There is " + issues.length + " requests assigned" if verbose_mode == 'true'
 
     issues.forEach (issue) ->
       # Abort if it's closed or not a pull request.
@@ -79,31 +104,33 @@ checkReviews = (robot, issue, res) ->
           ignoreList.push slug
         else
           if process.env.HUBOT_LGTM_DISABLE_MD
-            notify robot, res, "Merged #{url}. Thanks for the review #{Object.keys(approvers).join(' and ')}! ✌︎"
+            notify robot, res, "I merged #{url}. Thanks for the review #{Object.keys(approvers).join(' and ')}! ✌︎"
           else
-            notify robot, res, "Merged [#{issue.repo}##{issue.number}](#{url}). Thanks for the review #{Object.keys(approvers).join(' and ')}! ✌︎"
+            notify robot, res, "I merged [#{issue.repo}##{issue.number}](#{url}). Thanks for the [review](https://github.com/catops/hubot-lgtm#usage) #{Object.keys(approvers).join(' and ')}! ✌︎"
 
 notify = (robot, res, msg) ->
-  if msg is not /No pull requests have been assigned/           # Filter the dummy message , but keep checking on background.
-    if res and /Response/.test res.constructor.name
-      return res.send msg
-    if room
-      return robot.messageRoom room, msg
+  console.log('Verbose mode is: ' + verbose_mode)
+
+  if res and /Response/.test res.constructor.name
+    return res.send msg
+  if room
+    return robot.messageRoom room, msg
 
 module.exports = (robot) ->
+  console.log('Verbose mode is: ' + verbose_mode)
 
   return robot.logger.error "HUBOT_LGTM_GITHUB_TOKEN is not defined." if not token
   github.authenticate type: "oauth", token: token
 
   robot.respond /check (your )?(pull requests|prs?)/i, (res) ->
-  mergePullRequests robot, res
+    mergePullRequests robot, res
 
   robot.respond /(show|list|what are) (your )?(pull requests|prs?)/i, (res) ->
-  listPullRequests robot, res
+    listPullRequests robot, res
 
-  # HUBOT_LGTM_INTERVAL is set to false, don't poll GitHub.
+  # HUBOT_LGTM_INTERVAL is set to false, don't poll GH.
   return if not interval
 
   setInterval(=>
-  mergePullRequests robot
+    mergePullRequests robot
   , interval * 1000)
