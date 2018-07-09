@@ -30,29 +30,21 @@ github = new github version: "3.0.0", debug: false, headers: Accept: "applicatio
 # Keep track of pull requests with conflicts so that the bot doesn't keep trying to merge them.
 ignoreList = []
 
+# ----------------------------------------------------------------------------------------
 # List all pull requests assigned to the bot.
+# ----------------------------------------------------------------------------------------
 listPullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
 
-    console.log('listPullRequests: ' + verbose_mode + ' Issues length: '+ issues.length)
+    # console.log('listPullRequests: ' + verbose_mode + ' Issues length: '+ issues.length)
 
     if not issues.length
-      if verbose_mode == true
-        # console.log('mergePullRequests verbose no issues')
-        return notify robot, res, "listPullRequests: No pull requests have been assigned"
-      else
-        console.log('listPullRequests: Verbose mode off - no issues')
-
+      console.log('listPullRequests: Verbose mode is: ' + verbose_mode + ' > No issues')
+      return notify robot, res, "listPullRequests: No pull requests have been assigned"
     else
-      if verbose_mode == true
-        console.log('listPullRequests Issues > 0 ')
-        return notify robot, res, "listPullRequests: There is " + issues.length + " requests assigned"
-        # return notify robot, res, "listPullRequests: There is " + issues.length + " requests assigned" if verbose_mode == true
-
-      else
-        console.log('mergePullRequests: Verbose mode off - ' + issues.length + ' requests assigned')
-
+      console.log('listPullRequests Issues > 0 ')
+      return notify robot, res, "listPullRequests: There is " + issues.length + " requests" if verbose_mode == 'true'
 
     pullRequests = issues.map (issue) ->
       if issue.pull_request and issue.state is "open"
@@ -60,19 +52,21 @@ listPullRequests = (robot, res) ->
     pullRequests = pullRequests.filter (pr) -> pr
     notify robot, res, "I'm monitoring these pull requests:\n- #{pullRequests.join('\n- ')}"
 
+# ----------------------------------------------------------------------------------------
 # Iterate assigned pull requests and merge approved ones.
+# ----------------------------------------------------------------------------------------
 mergePullRequests = (robot, res) ->
   github.issues.getAll {}, (err, resp) ->
     issues = resp.data
 
-    console.log('mergePullRequests: ' + verbose_mode + ' Issues length: '+ issues.length + ' Issues content: ' + issues)
+    # console.log('mergePullRequests: ' + verbose_mode + ' Issues length: '+ issues.length + ' Issues content: ' + issues)
 
     if not issues.length
-        console.log('mergePullRequests: Verbose mode is: ' + verbose_mode + ' > No pull requests have been assigned')
-        return notify robot, res, "mergePullRequests: No pull requests have been assigned" if verbose_mode == 'true'
+      console.log('mergePullRequests: Verbose mode is: ' + verbose_mode + ' > No pull requests have been assigned')
+      return notify robot, res, "mergePullRequests: No pull requests have been assigned" if verbose_mode == 'true'
     else
-        console.log('mergePullRequests Issues > 0 ')
-        return notify robot, res, "mergePullRequests: There is " + issues.length + " requests assigned" if verbose_mode == 'true'
+      console.log('mergePullRequests Issues > 0 ')
+      return notify robot, res, "mergePullRequests: There is " + issues.length + " requests assigned" if verbose_mode == 'true'
 
     issues.forEach (issue) ->
       # Abort if it's closed or not a pull request.
