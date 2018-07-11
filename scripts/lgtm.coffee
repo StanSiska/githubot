@@ -64,19 +64,19 @@ mergePullRequests = (robot, res) ->
     if not issues.length
       console.log('mergePullRequests: Verbose mode is: ' + verbose_mode + ' > No pull requests have been assigned')
       return notify robot, res, "mergePullRequests: No pull requests have been assigned" if verbose_mode == 'true'
-    else
-      console.log('mergePullRequests Issues > 0 ')
-      return notify robot, res, "mergePullRequests: There is " + issues.length + " requests assigned" if verbose_mode == 'true'
+    # else
+    #   console.log('mergePullRequests Issues > 0 ')
+    #   return notify robot, res, "mergePullRequests: There is " + issues.length + " requests assigned" if verbose_mode == 'true'
 
-      issues.forEach (issue) ->
-        # Abort if it's closed or not a pull request.
-        return if not issue.pull_request or issue.state != "open"
-        issue =
-          user: issue.repository.owner.login
-          repo: issue.repository.name
-          number: issue.number
-        slug = "#{issue.user}#{issue.repo}#{issue.number}"
-        checkReviews robot, issue, res
+    issues.forEach (issue) ->
+      # Abort if it's closed or not a pull request.
+      return if not issue.pull_request or issue.state != "open"
+      issue =
+        user: issue.repository.owner.login
+        repo: issue.repository.name
+        number: issue.number
+      slug = "#{issue.user}#{issue.repo}#{issue.number}"
+      checkReviews robot, issue, res
 
 checkReviews = (robot, issue, res) ->
   url = "https://github.com/#{issue.user}/#{issue.repo}/pull/#{issue.number}"
