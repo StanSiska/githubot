@@ -41,7 +41,7 @@ listPullRequests = (robot, res) ->
 
     if not issues.length
       console.log('listPullRequests: Verbose mode is: ' + verbose_mode + ' > No issues')
-      return notify robot, res, "listPullRequests: No pull requests have been assigned"
+      return notify robot, res, "listPullRequests: No pull requests have been assigned" if verbose_mode == 'true'
     else
       console.log('listPullRequests Issues > 0 ')
       return notify robot, res, "listPullRequests: There is " + issues.length + " requests" if verbose_mode == 'true'
@@ -68,15 +68,15 @@ mergePullRequests = (robot, res) ->
       console.log('mergePullRequests Issues > 0 ')
       return notify robot, res, "mergePullRequests: There is " + issues.length + " requests assigned" if verbose_mode == 'true'
 
-    issues.forEach (issue) ->
-      # Abort if it's closed or not a pull request.
-      return if not issue.pull_request or issue.state != "open"
-      issue =
-        user: issue.repository.owner.login
-        repo: issue.repository.name
-        number: issue.number
-      slug = "#{issue.user}#{issue.repo}#{issue.number}"
-      checkReviews robot, issue, res
+      issues.forEach (issue) ->
+        # Abort if it's closed or not a pull request.
+        return if not issue.pull_request or issue.state != "open"
+        issue =
+          user: issue.repository.owner.login
+          repo: issue.repository.name
+          number: issue.number
+        slug = "#{issue.user}#{issue.repo}#{issue.number}"
+        checkReviews robot, issue, res
 
 checkReviews = (robot, issue, res) ->
   url = "https://github.com/#{issue.user}/#{issue.repo}/pull/#{issue.number}"
@@ -103,7 +103,6 @@ checkReviews = (robot, issue, res) ->
             notify robot, res, "I merged [#{issue.repo}##{issue.number}](#{url}). Thanks for the [review](https://github.com/catops/hubot-lgtm#usage) #{Object.keys(approvers).join(' and ')}! ✌︎"
 
 notify = (robot, res, msg) ->
-  console.log('Verbose mode is: ' + verbose_mode)
 
   if res and /Response/.test res.constructor.name
     return res.send msg
@@ -111,7 +110,6 @@ notify = (robot, res, msg) ->
     return robot.messageRoom room, msg
 
 module.exports = (robot) ->
-  console.log('Verbose mode is: ' + verbose_mode)
 
   return robot.logger.error "HUBOT_LGTM_GITHUB_TOKEN is not defined." if not token
   github.authenticate type: "oauth", token: token
